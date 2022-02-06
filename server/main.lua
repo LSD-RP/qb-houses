@@ -134,8 +134,8 @@ end
 
 local function isHouseOwned(house)
     local result = MySQL.Sync.fetchAll('SELECT owned FROM houselocations WHERE name = ?', {house})
-    if result[1] then
-        if result[1].owned then
+    if result[1] then 
+        if result[1].owned == 1 then
             return true
         end
     end
@@ -240,7 +240,7 @@ RegisterNetEvent('qb-houses:server:buyHouse', function(house)
         TriggerEvent('qb-bossmenu:server:addAccountMoney', "realestate", (HousePrice / 100) * math.random(18, 25))
         TriggerEvent('qb-log:server:CreateLog', 'house', Lang:t("log.house_purchased"), 'green', Lang:t("log.house_purchased_by", {house = house:upper(), price = HousePrice, firstname = pData.PlayerData.charinfo.firstname, lastname = pData.PlayerData.charinfo.lastname}))
     else
-        TriggerClientEvent('QBCore:Notify', source, Lang:t("error.not_enough_money"), "error")
+        TriggerClientEvent('QBCore:Notify', source, "Not enough money.", "error")
     end
 end)
 

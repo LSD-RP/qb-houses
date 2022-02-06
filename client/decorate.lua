@@ -490,7 +490,7 @@ CreateThread(function()
 		if DecoMode then
 			local camPos = GetCamCoord(MainCamera)
 			local dist = #(vector3(camPos.x, camPos.y, camPos.z) - vector3(Config.Houses[ClosestHouse].coords.enter.x, Config.Houses[ClosestHouse].coords.enter.y, Config.Houses[ClosestHouse].coords.enter.z))
-			if dist > 50.0 then
+			if false then
 				DisableEditMode()
 				closeDecorateUI()
 				QBCore.Functions.Notify(Lang:t("error.out_range"), 'error')

@@ -421,7 +421,27 @@ local function getDataForHouseTier(house, coords)
         [3] = function(coords) return exports['qb-interior']:CreateTrevorsShell(coords) end,
         [4] = function(coords) return exports['qb-interior']:CreateCaravanShell(coords) end,
         [5] = function(coords) return exports['qb-interior']:CreateLesterShell(coords) end,
-        [6] = function(coords) return exports['qb-interior']:CreateRanchShell(coords) end
+        [6] = function(coords) return exports['qb-interior']:CreateRanchShell(coords) end,
+        [7] = function(coords) return exports['qb-interior']:CreateHouseMedium3(coords) end, --works
+        [8] = function(coords) return exports['qb-interior']:CreateHouseLester(coords) end, -- works
+        [9] = function(coords) return exports['qb-interior']:CreateHouseFrankAunt(coords) end, -- works
+        [10] = function(coords) return exports['qb-interior']:CreateHouseTrailer(coords) end, -- works
+        [11] = function(coords) return exports['qb-interior']:CreateHouseMedium2(coords) end, -- works
+        [12] = function(coords) return exports['qb-interior']:CreateHousev16low(coords) end, -- works
+        [13] = function(coords) return exports['qb-interior']:CreateHouseTrevor(coords) end, -- works
+        [14] = function(coords) return exports['qb-interior']:CreateHousev16mid(coords) end, -- works
+        [15] = function(coords) return exports['qb-interior']:CreateHouseApartment2(coords) end, -- works
+        [16] = function(coords) return exports['qb-interior']:CreateHouseApartment1(coords) end, -- works
+        [17] = function(coords) return exports['qb-interior']:CreateHouseHighEndv2(coords) end, -- works
+        [18] = function(coords) return exports['qb-interior']:CreateHouseHighEnd(coords) end, -- works
+        [19] = function(coords) return exports['qb-interior']:CreateHouseApartment3(coords) end, -- works
+        [20] = function(coords) return exports['qb-interior']:CreateHouseMichael(coords) end, -- works
+        [21] = function(coords) return exports['qb-interior']:CreateHouseWestons(coords) end, -- works
+        [22] = function(coords) return exports['qb-interior']:CreateHouseWestons2(coords) end, -- works
+        [23] = function(coords) return exports['qb-interior']:CreateHouseBanham(coords) end, -- works 
+        [24] = function(coords) return exports['qb-interior']:CreateHouseStashHouse1(coords) end, -- wroks
+        [25] = function(coords) return exports['qb-interior']:CreateHouseStashHouse2(coords) end, -- works
+        [26] = function(coords) return exports['qb-interior']:CreateHouseStashHouse3(coords) end, -- works
     }
 
     if not shells[houseTier] then
@@ -1190,6 +1210,16 @@ CreateThread(function()
         end
     end
 end)
+
+AddEventHandler('onResourceStart', function(resourceName)
+	if (GetCurrentResourceName() ~= resourceName) then
+	  return
+	end
+	if PlayerPedId() then 
+		LocalPlayer.state['isLoggedIn'] = true
+	end
+
+  end)
 
 CreateThread(function()
     local shownMenu = false

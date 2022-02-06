@@ -60,11 +60,11 @@ $('document').ready(function() {
     })
 
     document.onkeyup = function (data) {
-        if (data.which == 116 ) {
+        if (data.key == 116 ) {
             $.post('https://qb-houses/toggleCursor');
         }
 
-        if (data.which == 13 ) {
+        if (data.key == 13 ) {
             if (selectedObjectData != null && $(".decorate-confirm").css('display') != 'block') {
                 $.post('https://qb-houses/editOwnedObject', JSON.stringify({
                     objectData: selectedObjectData
@@ -94,7 +94,7 @@ $('document').ready(function() {
             }
         }
 
-        if (data.which == 27) {
+        if (data.key == 27) {
             Decorations.Close();
         }
     };
