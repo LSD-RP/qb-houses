@@ -134,7 +134,11 @@ end
 
 local function isHouseOwned(house)
     local result = MySQL.Sync.fetchAll('SELECT owned FROM houselocations WHERE name = ?', {house})
+<<<<<<< HEAD
     if result[1] then 
+=======
+    if result[1] then
+>>>>>>> 5182461821d41e01ca6fb6ae07e4eeffbcb713c1
         if result[1].owned == 1 then
             return true
         end
