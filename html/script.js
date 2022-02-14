@@ -12,6 +12,7 @@ $('document').ready(function() {
 
     window.addEventListener('message', function(event) {
         var item = event.data;
+        console.log(item.type);
         if (item.type == "toggle") {
             if (item.status == true) {
                 $(".container").fadeIn(250);
@@ -60,11 +61,12 @@ $('document').ready(function() {
     })
 
     document.onkeyup = function (data) {
-        if (data.key == 116 ) {
+        console.log(data.key);
+        if (data.key == "F5" ) {
             $.post('https://qb-houses/toggleCursor');
         }
 
-        if (data.key == 13 ) {
+        if (data.key == "Enter" ) {
             if (selectedObjectData != null && $(".decorate-confirm").css('display') != 'block') {
                 $.post('https://qb-houses/editOwnedObject', JSON.stringify({
                     objectData: selectedObjectData
@@ -91,10 +93,12 @@ $('document').ready(function() {
                     $(".decorate-items").fadeOut(150);
                 }
                 selectedObject = null;
+            } else {
+                console.log("error reached");
             }
         }
 
-        if (data.key == 27) {
+        if (data.key == "Escape") {
             Decorations.Close();
         }
     };
