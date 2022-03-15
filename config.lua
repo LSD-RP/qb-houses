@@ -5,7 +5,8 @@ Config.RamsNeeded = 2
 Config.UnownedBlips = true
 
 Config.Houses = {}
--- CHEK ALL THE NUMBERS SO THEYA RE IN ORDER
+
+
 Config.Furniture = {
 	["sofas"] = {
 		label = "Sofas",
@@ -1206,6 +1207,62 @@ Config.Furniture = {
 			[126] = {["label"] = "Modern Light 8",              ["object"] = "ch_chint02_hip_cage_noneon",                       ["price"] = 1000},
 			[127] = {["label"] = "Modern Light 9",              ["object"] = "ch_chint02_robotgum_neon",                         ["price"] = 750},
 			[128] = {["label"] = "Modern Light 10",             ["object"] = "tr_int1_mod_neontubes_blue",                       ["price"] = 200},
+			[129] = {["label"] = "Lightsource 1",             ["object"] = "prop_spot_01",                       ["price"] = 500},
+			[130] = {["label"] = "Lightsource 2",             ["object"] = "prop_spot_clamp_02",                       ["price"] = 250},
+			[131] = {["label"] = "Lightsource 3",             ["object"] = "prop_worklight_02a",                       ["price"] = 250},
+			[132] = {["label"] = "Lightsource 4",             ["object"] = "prop_worklight_01a",                       ["price"] = 450},
+			[133] = {["label"] = "Lightsource 5",             ["object"] = "prop_worklight_04d",                       ["price"] = 250},
+			[134] = {["label"] = "Light Pole 1",             ["object"] = "v_19_strpfrntpl",                       ["price"] = 500},
+			[135] = {["label"] = "Lightsource 6",             ["object"] = "v_19_strpstrplit",                       ["price"] = 250},
+			[136] = {["label"] = "Lightsource 7",             ["object"] = "v_31a_worklight_03b",                       ["price"] = 750},
+			[137] = {["label"] = "Lightsource 8",             ["object"] = "v_44_kitc_chand",                       ["price"] = 1750},
+			[138] = {["label"] = "Lightsource 9",             ["object"] = "v_8_bed1bulbon",                       ["price"] = 100},
+			[139] = {["label"] = "Lightsource 10",             ["object"] = "v_8_studybulbon",                       ["price"] = 100},
+			[140] = {["label"] = "Lightsource 11",             ["object"] = "v_med_cor_walllight",                       ["price"] = 400},
+			[141] = {["label"] = "Lightsource 12",             ["object"] = "v_med_examlight_static",                       ["price"] = 1400},
+			[142] = {["label"] = "Lightsource 13",             ["object"] = "prop_securityvan_lightrig",                       ["price"] = 750},
+			[143] = {["label"] = "Lightsource 14",             ["object"] = "prop_wall_light_04a",                       ["price"] = 750},
+			[144] = {["label"] = "Lightsource 15",             ["object"] = "prop_wall_light_10a",                       ["price"] = 500},
+			[145] = {["label"] = "Lightsource 15",             ["object"] = "prop_wall_light_10b",                       ["price"] = 500},
+			[146] = {["label"] = "Lightsource 15",             ["object"] = "prop_wall_light_10c",                       ["price"] = 500},
+			[147] = {["label"] = "Lightsource 16",             ["object"] = "prop_wall_light_12",                       ["price"] = 250},
+			[148] = {["label"] = "Lightsource 17",             ["object"] = "prop_wall_light_12a",                       ["price"] = 250},
+			[149] = {["label"] = "Lightsource 18",             ["object"] = "prop_wall_light_13a",                       ["price"] = 250},
+			[150] = {["label"] = "Lightsource 19",             ["object"] = "prop_wall_light_15a",                       ["price"] = 1500},
+			[151] = {["label"] = "Lightsource 20",             ["object"] = "prop_wall_light_20a",                       ["price"] = 500},
+			[152] = {["label"] = "Lightsource 21",             ["object"] = "prop_walllight_ld_01",                       ["price"] = 500},
+			[153] = {["label"] = "Lightsource 22",             ["object"] = "prop_warninglight_01",                       ["price"] = 750},
+			[154] = {["label"] = "Lightsource 23",             ["object"] = "prop_air_conelight",                       ["price"] = 500},
+			[155] = {["label"] = "Lightsource 24",             ["object"] = "prop_air_lights_02a",                       ["price"] = 500},
+			[156] = {["label"] = "Lightsource 25",             ["object"] = "prop_air_lights_02b",                       ["price"] = 500},
+			[157] = {["label"] = "Lightsource 26",             ["object"] = "prop_air_lights_03a",                       ["price"] = 500},
+			[158] = {["label"] = "Lightsource 27",             ["object"] = "ch_prop_ch_lamp_ceiling_02a",                       ["price"] = 750},
+			[159] = {["label"] = "Lightsource 28",             ["object"] = "ch_prop_ch_lamp_ceiling_02b",                       ["price"] = 750},
+			[160] = {["label"] = "Lightsource 29",             ["object"] = "ch_prop_ch_utility_light_wall_01a",                       ["price"] = 250},
+			[161] = {["label"] = "Lightsource 30",             ["object"] = "ch_prop_tunnel_hang_lamp2",                       ["price"] = 250},
+			[162] = {["label"] = "Lightsource 31",             ["object"] = "ch_prop_tunnel_tripod_lampa",                       ["price"] = 1250},
+			[163] = {["label"] = "Lightsource 32",             ["object"] = "apa_mp_h_lit_lightpendant_01",                       ["price"] = 850},
+			[164] = {["label"] = "Lightsource 33",             ["object"] = "ba_prop_club_emis_rig_10_shad",                       ["price"] = 1250},
+			[165] = {["label"] = "Lightsource 34",             ["object"] = "xm_int_prop_tinsel_aven_01a",                       ["price"] = 1500},
+			[166] = {["label"] = "Lightsource 35",             ["object"] = "xm_int_prop_tinsel_truck_main",                       ["price"] = 1500},
+			[167] = {["label"] = "Lightsource 36",             ["object"] = "xm_prop_lab_floor_lampa",                       ["price"] = 250},
+			[168] = {["label"] = "Lightsource 37",             ["object"] = "xm_prop_x17_mine_01a",                       ["price"] = 1400},
+			[169] = {["label"] = "Lightsource 38",             ["object"] = "xs_prop_arena_drone_02",                       ["price"] = 4000},
+			[170] = {["label"] = "Lightsource 39",             ["object"] = "xs_prop_arena_lights_tube_l_a",                       ["price"] = 400},
+			[171] = {["label"] = "Lightsource 40",             ["object"] = "xs_prop_vipl_lights_floor",                       ["price"] = 400},
+			[172] = {["label"] = "Lightsource 41",             ["object"] = "xs_prop_arena_landmine_01c",                       ["price"] = 1400},
+			[173] = {["label"] = "Lightsource 42",             ["object"] = "xs_prop_arena_landmine_03a",                       ["price"] = 1400},
+			[174] = {["label"] = "Lightsource 43",             ["object"] = "xs_prop_arena_landmine_01c_wl",                       ["price"] = 1400},
+			[175] = {["label"] = "Lightsource 44",             ["object"] = "xs_prop_arena_landmine_01c_wl",                       ["price"] = 1400},
+			[176] = {["label"] = "Lightsource 45",             ["object"] = "hei_prop_hei_keypad_01",                       ["price"] = 100},
+			[177] = {["label"] = "Lightsource 46",             ["object"] = "hei_prop_wall_light_10a_cr",                       ["price"] = 500},
+			[178] = {["label"] = "Lightsource 47",             ["object"] = "hei_heist_lit_lamptable_06",                       ["price"] = 500},
+			[179] = {["label"] = "Lightsource 48",             ["object"] = "ch_prop_emp_01b",                       ["price"] = 400},
+			[180] = {["label"] = "Lightsource 49",             ["object"] = "sm_prop_smug_crate_s_hazard",                       ["price"] = 1500},
+			[181] = {["label"] = "Lightsource 50",             ["object"] = "apa_mpa7__floorlamp003",                       ["price"] = 250},
+			[182] = {["label"] = "Lightsource 51",             ["object"] = "h4_int_club_int_flores_int_00",                       ["price"] = 400},
+			[183] = {["label"] = "Lightsource 52",             ["object"] = "h4_mph4_bch_disco_pole_04",                       ["price"] = 800},
+			[184] = {["label"] = "Lightsource 53",             ["object"] = "tr_int1_mod_mural_neon",                       ["price"] = 5000},
 		},
 	},
 	["tables"] = {
@@ -1835,6 +1892,7 @@ Config.Furniture = {
 			[178] = {["label"] = "Wall Art 158", ["object"] = "apa_mp_stilts_a_bathart",            ["price"] = 250},
 			[179] = {["label"] = "Wall Art 159", ["object"] = "ex_office_01c_bathart",              ["price"] = 250},
 			[180] = {["label"] = "Wall Art 160", ["object"] = "ex_office_03a_bathroomart",          ["price"] = 250},
+			[181] = {["label"] = "Wall Art 161", ["object"] = "ch_chint02_bathroom_graffiti",          ["price"] = 250},
 		},
 	},
 	["jewels"] = {
@@ -2091,3 +2149,20 @@ Config.Furniture = {
 		}
 	}
 }
+
+
+
+-- Config.Furniture = {
+-- 	["sofas"] = {
+-- 		label = "Sofas",
+-- 		items = {
+-- 			[1] = { ["object"] = "miss_rub_couch_01", ["price"] = 300, ["label"] = "Old couch" },
+-- 			[2] = { ["object"] = "prop_fib_3b_bench", ["price"] = 700, ["label"] = "Threesits couch" },
+
+Config.Prices = {}
+for category,data in pairs(Config.Furniture) do
+	for items, tab in pairs(data.items) do
+		Config.Prices[tab['object']] = tab['price']
+	end
+end
+

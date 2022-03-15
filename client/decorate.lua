@@ -2,7 +2,7 @@ ObjectList = {}
 local DecoMode = false
 local MainCamera = nil
 local curPos
-local speeds = {0.01, 0.05, 0.1, 0.2, 0.4, 0.5}
+local speeds = {0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.4, 0.5}
 local curSpeed = 1
 local cursorEnabled = false
 local SelectedObj = nil
@@ -243,13 +243,27 @@ RegisterNUICallback("closedecorations", function(data, cb)
 end)
 
 RegisterNUICallback("deleteSelectedObject", function(data, cb)
-	DeleteObject(SelectedObj)
-	SelectedObj = nil
-	table.remove(ObjectList, SelObjId)
-	Wait(100)
-	SaveDecorations()
-	SelObjId = 0
-	peanut = false
+	-- DeleteObject(SelectedObj)
+	-- SelectedObj = nil
+	-- table.remove(ObjectList, SelObjId)
+	-- Wait(100)
+	-- SaveDecorations()
+	-- SelObjId = 0
+	-- peanut = false
+
+	local price = Config.Prices[data.objData.hashname]
+
+	QBCore.Functions.TriggerCallback('qb-houses:server:sellFurniture', function(isSuccess)
+        if isSuccess then
+            DeleteObject(SelectedObj)
+			SelectedObj = nil
+			table.remove(ObjectList, SelObjId)
+			Wait(100)
+			SaveDecorations()
+			SelObjId = 0
+			peanut = false
+        end
+    end, price, data.objData.hashname)
 end)
 
 RegisterNUICallback("cancelSelectedObject", function(data, cb)
@@ -260,6 +274,7 @@ RegisterNUICallback("cancelSelectedObject", function(data, cb)
 end)
 
 RegisterNUICallback("buySelectedObject", function(data, cb)
+	if data.info.price == nil then data.info.price = 0 end
     QBCore.Functions.TriggerCallback('qb-houses:server:buyFurniture', function(isSuccess)
         if isSuccess then
             SetNuiFocus(false, false)
@@ -274,7 +289,7 @@ RegisterNUICallback("buySelectedObject", function(data, cb)
             SelObjId = 0
             peanut = false
         end
-    end, data.price)
+    end, data.info.price, data.info.object)
 end)
 
 RegisterNUICallback('setupMyObjects', function(data, cb)
@@ -372,11 +387,12 @@ RegisterNUICallback("spawnobject", function(data, cb)
     local pos = GetEntityCoords(SelectedObj, true)
     local rot = GetEntityRotation(SelectedObj)
     SelObjRot = {x = rot.x, y = rot.y, z = rot.z}
-	SelObjPos = {x = pos.x, y = pos.y, z = pos.z}
+	
 	SelObjHash = data.object
 	PlaceObjectOnGroundProperly(SelectedObj)
 	SetEntityCompletelyDisableCollision(SelectedObj, true) -- Prevents crazy physics when collidin with other entitys
-    peanut = true
+    SelObjPos = {x = pos.x, y = pos.y, z = pos.z}
+	peanut = true
 end)
 
 RegisterNUICallback("chooseobject", function(data, cb)
@@ -412,7 +428,7 @@ end)
 
 CreateThread(function()
 	while true do
-		Wait(7)
+		Wait(2)
 		if DecoMode then
 			DisableAllControlActions(0)
 			EnableControlAction(0, 32, true) -- W
@@ -431,6 +447,7 @@ CreateThread(function()
 			EnableControlAction(0, 10, true) -- Page Up
             EnableControlAction(0, 11, true) -- Page Down
             EnableControlAction(0, 194, true) -- Backspace
+			EnableControlAction(0, 137, true)
 
 			DisplayRadar(false)
 
@@ -438,8 +455,8 @@ CreateThread(function()
             CheckMovementInput()
 
 			if SelectedObj and peanut then
-		SetEntityDrawOutline(SelectedObj)
-		SetEntityDrawOutlineColor(116, 189, 252, 100)
+				SetEntityDrawOutline(SelectedObj)
+				SetEntityDrawOutlineColor(116, 189, 252, 100)
                 DrawMarker(21, SelObjPos.x, SelObjPos.y, SelObjPos.z + 1.28, 0.0, 0.0, 0.0, 180.0, 0.0, 0.0, 0.6, 0.6, 0.6, 28, 149, 255, 100, true, true, 2, false, false, false, false)
                 if rotateActive then
                     CheckObjRotationInput()
@@ -454,6 +471,10 @@ CreateThread(function()
 					local groundPos = GetEntityCoords(SelectedObj)
 					SelObjPos = groundPos
                 end
+				if IsControlJustReleased(0, 137) then -- CAPS
+					SelObjPos = vector3(SelObjPos.x, SelObjPos.y, SelObjPos.z - 1)
+					SetEntityCoords(SelectedObj, SelObjPos.x, SelObjPos.y, SelObjPos.z)
+				end
 				if IsControlJustReleased(0, 191) then -- Enter
 					SetNuiFocus(true, true)
 					cursorEnabled = true
@@ -478,7 +499,7 @@ CreateThread(function()
 						cursorEnabled = true
 					end
 				end
-                        end
+			end
 		end
 	end
 end)

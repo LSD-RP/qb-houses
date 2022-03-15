@@ -179,7 +179,9 @@ $(document).on('click', '.footer-btn', function(){
         $(".decorate-items").html("");
         $(".decorate-footer-buttons").html("");
         $(selectedHeaderButton).removeClass('header-btn-selected');
-        $.post('https://qb-houses/deleteSelectedObject');
+        $.post('https://qb-houses/deleteSelectedObject', JSON.stringify({
+            objData: selectedObjectData,
+        }));
         $(".decorate-footer-buttons").fadeOut(150);
         $(".decorate-items").fadeOut(150);
     }
@@ -187,7 +189,7 @@ $(document).on('click', '.footer-btn', function(){
 
 $(document).on('click', '#buy-object', function(){
     $.post("https://qb-houses/buySelectedObject", JSON.stringify({
-        price: selectedObjectData.price,
+        info: selectedObjectData,
     }));
     selectedObjectData = null;
     $(".decorate-confirm").css("display", "none");

@@ -461,6 +461,9 @@ local function getDataForHouseTier(house, coords)
         [43] = function(coords) return exports['qb-interior']:CreateHouseShitWarehouse(coords) end,
         [44] = function(coords) return exports['qb-interior']:CreateHouseHugeWarehouse(coords) end,
         [45] = function(coords) return exports['qb-interior']:CreateHouseWeedPrefilledWarehouse(coords) end,
+        [46] = function(coords) return exports['qb-interior']:CreateFurniMotelModern(coords) end,
+        [47] = function(coords) return exports['qb-interior']:CreateContainer(coords) end,
+        [48] = function(coords) return exports['qb-interior']:CreateFurniMotelStandard(coords) end,
     }
 
     if not shells[houseTier] then
@@ -615,6 +618,18 @@ RegisterNetEvent('qb-houses:client:EnterHouse', function()
     end
 end)
 
+RegisterNetEvent('qb-houses:client:PreviewHouse', function()
+    local ped = PlayerPedId()
+    local pos = GetEntityCoords(ped)
+
+    if ClosestHouse ~= nil then
+        local dist = #(pos - vector3(Config.Houses[ClosestHouse].coords.enter.x, Config.Houses[ClosestHouse].coords.enter.y, Config.Houses[ClosestHouse].coords.enter.z))
+        if dist <= 1.5 then
+            enterNonOwnedHouse(ClosestHouse)
+        end
+    end
+end)
+
 RegisterNetEvent('qb-houses:client:RequestRing', function()
     if ClosestHouse ~= nil then
         TriggerServerEvent('qb-houses:server:RingDoor', ClosestHouse)
@@ -666,6 +681,39 @@ RegisterNetEvent('qb-houses:client:createHouses', function(price, tier)
     street = street:gsub("%-", " ")
     TriggerServerEvent('qb-houses:server:addNewHouse', street, coords, price, tier)
     if Config.UnownedBlips then TriggerServerEvent('qb-houses:server:createBlip') end
+end)
+
+local confirm = false
+RegisterNetEvent('qb-houses:client:deleteHouse', function()
+    QBCore.Functions.TriggerCallback('qb-houses:server:ProximityKO', function(key, owned)
+        HasHouseKey = key
+        isOwned = owned
+        print(isOwned)
+        if ClosestHouse ~= nil and not isOwned then
+            -- remove the house
+            print(ClosestHouse)
+            QBCore.Functions.Notify("Type /confirmremove to remove: " .. ClosestHouse)
+            confirm = true
+            Wait(15000)
+            print("wait over")
+            confirm = false
+        else
+            QBCore.Functions.Notify("This house is owned and cannot be removed.")
+        end
+    end, ClosestHouse)
+    
+
+end)
+
+RegisterNetEvent('qb-houses:client:confirmDelete', function()
+    if confirm == true then
+        -- trigger server delete of ClosestHouse
+        TriggerServerEvent('qb-houses:server:removeHouse', ClosestHouse)
+        Config.Houses[ClosestHouse] = nil
+        ClosestHouse = nil
+    else
+        QBCore.Functions.Notify('You must first /removehouse')
+    end
 end)
 
 RegisterNetEvent('qb-houses:client:addGarage', function()
@@ -1108,9 +1156,11 @@ AddEventHandler('onResourceStart', function(resourceName)
 	end
 	if PlayerPedId() then 
 		LocalPlayer.state['isLoggedIn'] = true
+        Wait(2000)
+        TriggerEvent('qb-houses:client:refreshBlips')
 	end
 
-  end)
+end)
 
 CreateThread(function()
     local shownMenu = false
@@ -1201,7 +1251,14 @@ CreateThread(function()
                                                 event = 'qb-houses:client:ViewHouse',
                                                 args = {}
                                             }
-                                        }
+                                        },
+                                        {
+                                            header = Lang:t("menu.preview_house"),
+                                            params = {
+                                                event = "qb-houses:client:PreviewHouse",
+    
+                                            }
+                                        },
                                     }
                                     nearLocation = true
                                 end
