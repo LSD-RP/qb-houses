@@ -474,7 +474,7 @@ local function getDataForHouseTier(house, coords)
     end
 end
 
--- If you are using paid shells the comment function above and uncomment this or grab the ones you need
+-- If you are using paid shells then comment function above and uncomment this or grab the ones you need
 
 local function enterOwnedHouse(house)
     CurrentHouse = house
