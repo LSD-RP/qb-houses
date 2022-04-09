@@ -22,12 +22,14 @@ local Translations = {
         ["remove_key_from"] = "Keys Have Been Removed From %{firstname} %{lastname}",
         ["already_keys"] = "This person already has the keys of the house!",
         ["something_wrong"] = "Something went wrong try again!",
+        ["nobody_at_door"] = 'There is nobody at the door...'
     },
     success = {
         ["unlocked"] = "House is unlocked!",
         ["home_invasion"] = "The door is now open.",
         ["lock_invasion"] = "You locked the house again..",
-        ["recieved_key"] = "You have the keys of %{value} recieved!"
+        ["recieved_key"] = "You have the keys of %{value} recieved!",
+        ["house_purchased"] = "You have successfully bought the house!"
     },
     info = {
         ["door_ringing"] = "Someone is ringing the door!",
@@ -48,6 +50,7 @@ local Translations = {
     },
     menu = {
         ["house_options"] = "House Options",
+        ["close_menu"] = "⬅ Close Menu",
         ["enter_house"] = "Enter Your House",
         ["give_house_key"] = "Give House Key",
         ["exit_property"] = "Exit Property",
@@ -67,6 +70,11 @@ local Translations = {
         ["enter_unlocked_house"] = "Enter Unlocked House",
         ["lock_door_police"] = "Lock Door",
         ["preview_house"] = "Preview House Interior"
+    },
+    target = {
+        ["open_stash"] = "[E] Open Stash",
+        ["outfits"] = "[E] Change Outfits",
+        ["change_character"] = "[E] Change Character",
     },
     log = {
         ["house_created"] = "House Created:",
