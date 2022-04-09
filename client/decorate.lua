@@ -447,7 +447,8 @@ CreateThread(function()
 			EnableControlAction(0, 10, true) -- Page Up
             EnableControlAction(0, 11, true) -- Page Down
             EnableControlAction(0, 194, true) -- Backspace
-			EnableControlAction(0, 137, true)
+			EnableControlAction(0, 137, true) -- CAPSLOCK
+			EnableControlAction(0, 200, true) -- ESC
 
 			DisplayRadar(false)
 
@@ -511,7 +512,8 @@ CreateThread(function()
 		if DecoMode then
 			local camPos = GetCamCoord(MainCamera)
 			local dist = #(vector3(camPos.x, camPos.y, camPos.z) - vector3(Config.Houses[ClosestHouse].coords.enter.x, Config.Houses[ClosestHouse].coords.enter.y, Config.Houses[ClosestHouse].coords.enter.z))
-			if false then
+			-- if false then
+			if IsControlJustReleased(0, 200) then
 				DisableEditMode()
 				closeDecorateUI()
 				QBCore.Functions.Notify(Lang:t("error.out_range"), 'error')

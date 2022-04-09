@@ -492,8 +492,8 @@ local function enterOwnedHouse(house)
     entering = true
     Wait(500)
     TriggerServerEvent('qb-houses:server:SetInsideMeta', house, true)
-    --TriggerEvent('qb-weathersync:client:DisableSync')
-    TriggerEvent('qb-weathersync:client:EnableSync')
+    TriggerEvent('qb-weathersync:client:DisableSync')
+    -- TriggerEvent('qb-weathersync:client:EnableSync')
     TriggerEvent('qb-weed:client:getHousePlants', house)
     entering = false
     setHouseLocations()
@@ -537,8 +537,8 @@ local function enterNonOwnedHouse(house)
     entering = true
     Wait(500)
     TriggerServerEvent('qb-houses:server:SetInsideMeta', house, true)
-    --TriggerEvent('qb-weathersync:client:DisableSync')
-    TriggerEvent('qb-weathersync:client:EnableSync')
+    TriggerEvent('qb-weathersync:client:DisableSync')
+    -- TriggerEvent('qb-weathersync:client:EnableSync')
     TriggerEvent('qb-weed:client:getHousePlants', house)
     entering = false
     InOwnedHouse = true
@@ -860,14 +860,17 @@ RegisterNetEvent('qb-houses:client:setupHouseBlips', function() -- Setup owned o
 end)
 
 RegisterNetEvent('qb-houses:client:setupHouseBlips2', function() -- Setup unowned on load
+    Wait(5000)
     for k,v in pairs(Config.Houses) do
-        if not v.owned then
+        -- print(v.adress)
+        if v.owned == 0 and string.sub(v.adress, 1, 9) ~= 'Buccaneer' then
+            -- print("create unowned blip")
             HouseBlip2 = AddBlipForCoord(v.coords.enter.x, v.coords.enter.y, v.coords.enter.z)
             SetBlipSprite (HouseBlip2, 40)
             SetBlipDisplay(HouseBlip2, 4)
             SetBlipScale  (HouseBlip2, 0.65)
             SetBlipAsShortRange(HouseBlip2, true)
-            SetBlipColour(HouseBlip2, 3)
+            SetBlipColour(HouseBlip2, 5)
             AddTextEntry('UnownedHouse', Lang:t("info.house_for_sale"))
             BeginTextCommandSetBlipName('UnownedHouse')
             EndTextCommandSetBlipName(HouseBlip2)
@@ -882,7 +885,7 @@ RegisterNetEvent('qb-houses:client:createBlip', function(coords) -- Create unown
     SetBlipDisplay(NewHouseBlip, 4)
     SetBlipScale  (NewHouseBlip, 0.65)
     SetBlipAsShortRange(NewHouseBlip, true)
-    SetBlipColour(NewHouseBlip, 3)
+    SetBlipColour(NewHouseBlip, 5)
     AddTextEntry('NewHouseBlip', Lang:t("info.house_for_sale"))
     BeginTextCommandSetBlipName('NewHouseBlip')
     EndTextCommandSetBlipName(NewHouseBlip)
@@ -1063,8 +1066,263 @@ end)
 
 RegisterNetEvent('qb-houses:client:OpenStash', function()
     local stashLoc = vector3(stashLocation.x, stashLocation.y, stashLocation.z)
+    -- for i,v in pairs(Config.Houses[CurrentHouse]) do
+    --     print(i)
+    --     print(v)
+    -- end
+    local tier = Config.Houses[CurrentHouse].tier
+    local other = {
+        maxweight = 1000000,
+        slots = 50
+    }
+    if tier == 1 then
+        other = {
+            maxweight = 800000,
+            slots = 50
+        }
+    elseif tier == 2 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 3 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 4 then
+        other = {
+            maxweight = 800000,
+            slots = 50
+        }
+    elseif tier == 5 then
+        other = {
+            maxweight = 600000,
+            slots = 40
+        }
+    elseif tier == 6 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 7 then
+        other = {
+            maxweight = 1200000,
+            slots = 70
+        }
+    elseif tier == 8 then
+        other = {
+            maxweight = 600000,
+            slots = 40
+        }
+    elseif tier == 9 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 10 then 
+        other = {
+            maxweight = 800000,
+            slots = 50
+        }
+    elseif tier == 11 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 12 then
+        other = {
+            maxweight = 800000,
+            slots = 50
+        }
+    elseif tier == 13 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 14 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 15 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 16 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 17 then
+        other = {
+            maxweight = 1200000,
+            slots = 70
+        }
+    elseif tier == 18 then
+        other = {
+            maxweight = 1500000,
+            slots = 75
+        }
+    elseif tier == 19 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 20 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 21 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 22 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 23 then
+        other = {
+            maxweight = 1200000,
+            slots = 70
+        }
+    elseif tier == 24 then 
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 25 then
+        other = {
+            maxweight = 1200000,
+            slots = 70
+        }
+    elseif tier == 26 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 27 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 28 then
+        other = {
+            maxweight = 1200000,
+            slots = 70
+        }
+    elseif tier == 29 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 30 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 31 then
+        other = {
+            maxweight = 1500000,
+            slots = 75
+        }
+    elseif tier == 32 then 
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 33 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 34 then
+        other = {
+            maxweight = 1500000,
+            slots = 75
+        }
+    elseif tier == 35 then
+        other = {
+            maxweight = 800000,
+            slots = 50
+        }
+    elseif tier == 36 then
+        other = {
+            maxweight = 800000,
+            slots = 50
+        }
+    elseif tier == 37 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 38 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 39 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 40 then
+        other = {
+            maxweight = 1500000,
+            slots = 75
+        }
+    elseif tier == 41 then
+        other = {
+            maxweight = 1200000,
+            slots = 70
+        }
+    elseif tier == 42 then 
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 43 then
+        other = {
+            maxweight = 1000000,
+            slots = 60
+        }
+    elseif tier == 44 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 45 then
+        other = {
+            maxweight = 2000000,
+            slots = 100
+        }
+    elseif tier == 46 then
+        other = {
+            maxweight = 600000,
+            slots = 40
+        }
+    elseif tier == 47 then
+        other = {
+            maxweight = 1500000,
+            slots = 75
+        }
+    elseif tier == 48 then
+        other = {
+            maxweight = 600000,
+            slots = 40
+        }
+    else 
+        other = {
+            maxweight = 1000000,
+            slots = 50
+        }
+    end
     if CheckDistance(stashLoc, 1.5) then
-        TriggerServerEvent("inventory:server:OpenInventory", "stash", CurrentHouse)
+        TriggerServerEvent("inventory:server:OpenInventory", "stash", CurrentHouse, other)
         TriggerServerEvent("InteractSound_SV:PlayOnSource", "StashOpen", 0.4)
         TriggerEvent("inventory:client:SetCurrentStash", CurrentHouse)
     end
@@ -1157,7 +1415,7 @@ AddEventHandler('onResourceStart', function(resourceName)
 	if PlayerPedId() then 
 		LocalPlayer.state['isLoggedIn'] = true
         Wait(2000)
-        TriggerEvent('qb-houses:client:refreshBlips')
+        -- TriggerEvent('qb-houses:client:refreshBlips')
 	end
 
 end)

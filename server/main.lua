@@ -571,6 +571,34 @@ QBCore.Functions.CreateCallback('qb-phone:server:TransferCid', function(source, 
     end
 end)
 
+QBCore.Functions.CreateCallback('qb-houses:server:sellHouse', function(source, cb, house)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local cid = Player.PlayerData.citizenid
+    local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = ?', {cid})
+    if result[1] then
+        local HouseName = house.name
+        housekeyholders[HouseName] = {}
+        housekeyholders[HouseName][1] = nil
+        houseownercid[HouseName] = nil
+        houseowneridentifier[HouseName] = nil
+        local salePrice = house.price * 0.80
+        salePrice = math.ceil(salePrice)
+        if Player.Functions.AddMoney('bank', salePrice) then
+            exports.oxmysql:execute('UPDATE houselocations SET owned = ? WHERE name = ?',
+            {0, HouseName})
+            exports.oxmysql:execute('DELETE FROM player_houses WHERE house = ? AND citizenid = ?',
+            {HouseName, cid})
+            cb(true)
+            TriggerClientEvent('qb-houses:client:refreshBlips', -1)
+        else
+            cb(false)
+        end
+    else
+        cb(false)
+    end
+end)
+
 QBCore.Functions.CreateCallback('qb-houses:server:getHouseDecorations', function(source, cb, house)
     local retval = nil
     local result = MySQL.Sync.fetchAll('SELECT * FROM player_houses WHERE house = ?', {house})

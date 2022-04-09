@@ -63,6 +63,7 @@ $('document').ready(function() {
     document.onkeyup = function (data) {
         console.log(data.key);
         if (data.key == "F5" ) {
+            console.log("toggle cursor")
             $.post('https://qb-houses/toggleCursor');
         }
 
