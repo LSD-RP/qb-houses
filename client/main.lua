@@ -69,7 +69,17 @@ local function showEntranceHeaderMenu(house)
                 event = "qb-houses:client:ViewHouse",
                 args = {}
             }
+            
         }
+        headerMenu[#headerMenu+1] = {
+            header = Lang:t("menu.preview_house"),
+            params = {
+                event = "qb-houses:client:PreviewHouse",
+
+            }
+        }
+
+
     else
         if isOwned and HasHouseKey then
             headerMenu[#headerMenu+1] = {
@@ -1150,6 +1160,7 @@ RegisterNetEvent('qb-houses:client:setupHouseBlips', function() -- Setup owned o
 end)
 
 RegisterNetEvent('qb-houses:client:setupHouseBlips2', function() -- Setup unowned on load
+    for k,v in pairs(UnownedHouseBlips) do RemoveBlip(v) end
     Wait(5000)
     for k,v in pairs(Config.Houses) do
         -- print(v.adress)

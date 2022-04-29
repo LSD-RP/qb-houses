@@ -597,6 +597,8 @@ QBCore.Functions.CreateCallback('qb-houses:server:sellHouse', function(source, c
             {HouseName, cid})
             cb(true)
             TriggerClientEvent('qb-houses:client:refreshBlips', -1)
+            TriggerEvent('qb-log:server:CreateLog', 'house', "House sold", 'red', Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname .. ' sold a house ' .. HouseName .. ' for $' .. salePrice)
+
         else
             cb(false)
         end
