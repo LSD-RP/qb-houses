@@ -313,6 +313,7 @@ RegisterNetEvent('qb-houses:server:buyHouse', function(house)
         exports['qb-management']:AddMoney("realestate", (HousePrice / 100) * math.random(18, 25))
         TriggerEvent('qb-log:server:CreateLog', 'house', Lang:t("log.house_purchased"), 'green', Lang:t("log.house_purchased_by", {house = house:upper(), price = HousePrice, firstname = pData.PlayerData.charinfo.firstname, lastname = pData.PlayerData.charinfo.lastname}))
         TriggerClientEvent('QBCore:Notify', src, Lang:t("success.house_purchased"), 'success', 5000)
+        TriggerClientEvent('qb-houses:client:refreshBlips', -1)
     else
         TriggerClientEvent('QBCore:Notify', source, "Not enough money.", "error")
     end
