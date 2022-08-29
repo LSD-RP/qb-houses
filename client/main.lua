@@ -2,7 +2,6 @@ QBCore = exports['qb-core']:GetCoreObject()
 IsInside = false
 ClosestHouse = nil
 HasHouseKey = false
-ContractOpen = false
 
 local isOwned = false
 local cam = nil
@@ -55,7 +54,7 @@ end
 
 -- Functions
 
-local function showEntranceHeaderMenu(house)
+local function showEntranceHeaderMenu()
     local headerMenu = {}
 
     if QBCore.Functions.GetPlayerData().job and QBCore.Functions.GetPlayerData().job.name == 'realestate' then
@@ -136,7 +135,7 @@ local function showEntranceHeaderMenu(house)
             event = 'qb-menu:client:closeMenu'
         }
     }
-   
+
     if headerMenu and next(headerMenu) then
         exports['qb-menu']:openMenu(headerMenu)
     end
@@ -308,7 +307,7 @@ local function RegisterHouseEntranceZone(id, house)
 
     zone:onPlayerInOut(function (isPointInside)
         if isPointInside then
-            showEntranceHeaderMenu(Config.Houses[ClosestHouse])
+            showEntranceHeaderMenu()
         else
             CloseMenuFull()
         end
@@ -322,15 +321,16 @@ local function DeleteBoxTarget(box)
         return
     end
 
-    box:destroy();
-    box = nil;
+    box:destroy()
 end
 
 local function DeleteHousesTargets()
     if Config.Targets and next(Config.Targets) then
         for id, target in pairs(Config.Targets) do
-            target.zone:destroy()
-            Config.Targets[id] = nil
+            if not string.find(id, "Exit") then
+                target.zone:destroy()
+                Config.Targets[id] = nil
+            end
         end
     end
 end
@@ -371,7 +371,6 @@ local function openContract(bool)
         type = "toggle",
         status = bool,
     })
-    ContractOpen = bool
 end
 
 local function GetClosestPlayer()
@@ -430,7 +429,7 @@ local function InstructionButtonMessage(text)
 end
 
 local function CreateInstuctionScaleform(scaleform)
-    local scaleform = RequestScaleformMovie(scaleform)
+    scaleform = RequestScaleformMovie(scaleform)
     while not HasScaleformMovieLoaded(scaleform) do
         Wait(0)
     end
@@ -540,7 +539,7 @@ local function SetClosestHouse()
     local current = nil
     local dist = nil
     if not IsInside then
-        for id, house in pairs(Config.Houses) do
+        for id, _ in pairs(Config.Houses) do
             local distcheck = #(pos - vector3(Config.Houses[id].coords.enter.x, Config.Houses[id].coords.enter.y, Config.Houses[id].coords.enter.z))
             if current ~= nil then
                 if distcheck < dist then
@@ -586,7 +585,7 @@ end
 
 local function UnloadDecorations()
 	if ObjectList ~= nil then
-		for k, v in pairs(ObjectList) do
+		for _, v in pairs(ObjectList) do
 			if DoesEntityExist(v.object) then
 				DeleteObject(v.object)
 			end
@@ -600,7 +599,7 @@ local function LoadDecorations(house)
 			Config.Houses[house].decorations = result
 			if Config.Houses[house].decorations ~= nil then
 				ObjectList = {}
-				for k, v in pairs(Config.Houses[house].decorations) do
+				for k, _ in pairs(Config.Houses[house].decorations) do
 					if Config.Houses[house].decorations[k] ~= nil then
 						if Config.Houses[house].decorations[k].object ~= nil then
 							if DoesEntityExist(Config.Houses[house].decorations[k].object) then
@@ -613,16 +612,17 @@ local function LoadDecorations(house)
 							Wait(10)
 						end
 						local decorateObject = CreateObject(modelHash, Config.Houses[house].decorations[k].x, Config.Houses[house].decorations[k].y, Config.Houses[house].decorations[k].z, false, false, false)
+						FreezeEntityPosition(decorateObject, true)
+						SetEntityCoordsNoOffset(decorateObject, Config.Houses[house].decorations[k].x, Config.Houses[house].decorations[k].y, Config.Houses[house].decorations[k].z)
 						SetEntityRotation(decorateObject, Config.Houses[house].decorations[k].rotx, Config.Houses[house].decorations[k].roty, Config.Houses[house].decorations[k].rotz)
 						ObjectList[Config.Houses[house].decorations[k].objectId] = {hashname = Config.Houses[house].decorations[k].hashname, x = Config.Houses[house].decorations[k].x, y = Config.Houses[house].decorations[k].y, z = Config.Houses[house].decorations[k].z, rotx = Config.Houses[house].decorations[k].rotx, roty = Config.Houses[house].decorations[k].roty, rotz = Config.Houses[house].decorations[k].rotz, object = decorateObject, objectId = Config.Houses[house].decorations[k].objectId}
-						FreezeEntityPosition(decorateObject, true)
 					end
 				end
 			end
 		end, house)
 	elseif Config.Houses[house].decorations ~= nil then
 		ObjectList = {}
-		for k, v in pairs(Config.Houses[house].decorations) do
+		for k, _ in pairs(Config.Houses[house].decorations) do
 			if Config.Houses[house].decorations[k] ~= nil then
 				if Config.Houses[house].decorations[k].object ~= nil then
 					if DoesEntityExist(Config.Houses[house].decorations[k].object) then
@@ -635,10 +635,12 @@ local function LoadDecorations(house)
 					Wait(10)
 				end
 				local decorateObject = CreateObject(modelHash, Config.Houses[house].decorations[k].x, Config.Houses[house].decorations[k].y, Config.Houses[house].decorations[k].z, false, false, false)
+				PlaceObjectOnGroundProperly(decorateObject)
+				FreezeEntityPosition(decorateObject, true)
+				SetEntityCoordsNoOffset(decorateObject, Config.Houses[house].decorations[k].x, Config.Houses[house].decorations[k].y, Config.Houses[house].decorations[k].z)
 				Config.Houses[house].decorations[k].object = decorateObject
 				SetEntityRotation(decorateObject, Config.Houses[house].decorations[k].rotx, Config.Houses[house].decorations[k].roty, Config.Houses[house].decorations[k].rotz)
 				ObjectList[Config.Houses[house].decorations[k].objectId] = {hashname = Config.Houses[house].decorations[k].hashname, x = Config.Houses[house].decorations[k].x, y = Config.Houses[house].decorations[k].y, z = Config.Houses[house].decorations[k].z, rotx = Config.Houses[house].decorations[k].rotx, roty = Config.Houses[house].decorations[k].roty, rotz = Config.Houses[house].decorations[k].rotz, object = decorateObject, objectId = Config.Houses[house].decorations[k].objectId}
-				FreezeEntityPosition(decorateObject, true)
 			end
 		end
 	end
@@ -684,7 +686,7 @@ function HouseKeysMenu()
     else
         keyholderMenu = {}
 
-        for k, v in pairs(holders) do
+        for k, _ in pairs(holders) do
             keyholderMenu[#keyholderMenu+1] = {
                 header = holders[k].firstname .. " " .. holders[k].lastname,
                 params = {
@@ -725,63 +727,102 @@ end
 
 -- Shell Configuration
 local function getDataForHouseTier(house, coords)
-    local houseTier = Config.Houses[house].tier
-    local shells = {
-        [1] = function(coords) return exports['qb-interior']:CreateApartmentShell(coords) end,
-        [2] = function(coords) return exports['qb-interior']:CreateTier1House(coords) end,
-        [3] = function(coords) return exports['qb-interior']:CreateTrevorsShell(coords) end,
-        [4] = function(coords) return exports['qb-interior']:CreateCaravanShell(coords) end,
-        [5] = function(coords) return exports['qb-interior']:CreateLesterShell(coords) end,
-        [6] = function(coords) return exports['qb-interior']:CreateRanchShell(coords) end,
-        [7] = function(coords) return exports['qb-interior']:CreateHouseMedium3(coords) end, --works
-        [8] = function(coords) return exports['qb-interior']:CreateHouseLester(coords) end, -- works
-        [9] = function(coords) return exports['qb-interior']:CreateHouseFrankAunt(coords) end, -- works
-        [10] = function(coords) return exports['qb-interior']:CreateHouseTrailer(coords) end, -- works
-        [11] = function(coords) return exports['qb-interior']:CreateHouseMedium2(coords) end, -- works
-        [12] = function(coords) return exports['qb-interior']:CreateHousev16low(coords) end, -- works
-        [13] = function(coords) return exports['qb-interior']:CreateHouseTrevor(coords) end, -- works
-        [14] = function(coords) return exports['qb-interior']:CreateHousev16mid(coords) end, -- works
-        [15] = function(coords) return exports['qb-interior']:CreateHouseApartment2(coords) end, -- works
-        [16] = function(coords) return exports['qb-interior']:CreateHouseApartment1(coords) end, -- works
-        [17] = function(coords) return exports['qb-interior']:CreateHouseHighEndv2(coords) end, -- works
-        [18] = function(coords) return exports['qb-interior']:CreateHouseHighEnd(coords) end, -- works
-        [19] = function(coords) return exports['qb-interior']:CreateHouseApartment3(coords) end, -- works
-        [20] = function(coords) return exports['qb-interior']:CreateHouseMichael(coords) end, -- works
-        [21] = function(coords) return exports['qb-interior']:CreateHouseWestons(coords) end, -- works
-        [22] = function(coords) return exports['qb-interior']:CreateHouseWestons2(coords) end, -- works
-        [23] = function(coords) return exports['qb-interior']:CreateHouseBanham(coords) end, -- works 
-        [24] = function(coords) return exports['qb-interior']:CreateHouseStashHouse1(coords) end, -- wroks
-        [25] = function(coords) return exports['qb-interior']:CreateHouseStashHouse2(coords) end, -- works
-        [26] = function(coords) return exports['qb-interior']:CreateHouseStashHouse3(coords) end, -- works
-        [27] = function(coords) return exports['qb-interior']:CreateHouseBarberShop(coords) end, -- works
-        [28] = function(coords) return exports['qb-interior']:CreateHouseDecentWarehouse(coords) end,
-        [29] = function(coords) return exports['qb-interior']:CreateHouseBiggerWarehouse(coords) end,
-        [30] = function(coords) return exports['qb-interior']:CreateHouseLargeGarage(coords) end,
-        [31] = function(coords) return exports['qb-interior']:CreateHouseMediumGarage(coords) end,
-        [32] = function(coords) return exports['qb-interior']:CreateHouseSmallGarage(coords) end,
-        [33] = function(coords) return exports['qb-interior']:CreateHouseGunStore(coords) end,
-        [34] = function(coords) return exports['qb-interior']:CreateHouseMethProduction(coords) end,
-        [35] = function(coords) return exports['qb-interior']:CreateHouseSmallOffice(coords) end, 
-        [36] = function(coords) return exports['qb-interior']:CreateHouseSmallOffice2(coords) end,
-        [37] = function(coords) return exports['qb-interior']:CreateHouseExecOffice(coords) end,
-        [38] = function(coords) return exports['qb-interior']:CreateHouseSmallStore(coords) end,
-        [39] = function(coords) return exports['qb-interior']:CreateHouseMediumStore(coords) end,
-        [40] = function(coords) return exports['qb-interior']:CreateHouseLiquorStore(coords) end,
-        [41] = function(coords) return exports['qb-interior']:CreateHouseSmallWarehouse(coords) end,
-        [42] = function(coords) return exports['qb-interior']:CreateHouseBiggerWarehouse(coords) end,
-        [43] = function(coords) return exports['qb-interior']:CreateHouseShitWarehouse(coords) end,
-        [44] = function(coords) return exports['qb-interior']:CreateHouseHugeWarehouse(coords) end,
-        [45] = function(coords) return exports['qb-interior']:CreateHouseWeedPrefilledWarehouse(coords) end,
-        [46] = function(coords) return exports['qb-interior']:CreateFurniMotelModern(coords) end,
-        [47] = function(coords) return exports['qb-interior']:CreateContainer(coords) end,
-        [48] = function(coords) return exports['qb-interior']:CreateFurniMotelStandard(coords) end,
-    }
-
-    if not shells[houseTier] then
-        QBCore.Functions.Notify(Lang:t("error.invalid_tier"), 'error')
-        return nil
-    else
-        return shells[houseTier](coords)
+    if Config.Houses[house].tier == 1 then
+        return exports['qb-interior']:CreateApartmentShell(coords)
+    elseif Config.Houses[house].tier == 2 then
+        return exports['qb-interior']:CreateTier1House(coords)
+    elseif Config.Houses[house].tier == 3 then
+        return exports['qb-interior']:CreateTrevorsShell(coords)
+    elseif Config.Houses[house].tier == 4 then
+        return exports['qb-interior']:CreateCaravanShell(coords)
+    elseif Config.Houses[house].tier == 5 then
+        return exports['qb-interior']:CreateLesterShell(coords)
+    elseif Config.Houses[house].tier == 6 then
+        return exports['qb-interior']:CreateRanchShell(coords)
+    elseif Config.Houses[house].tier == 7 then
+        return exports['qb-interior']:CreateHouseMedium3(coords)
+    elseif Config.Houses[house].tier == 8 then
+        return exports['qb-interior']:CreateHouseLester(coords)
+    elseif Config.Houses[house].tier == 9 then
+        return exports['qb-interior']:CreateHouseFrankAunt(coords)
+    elseif Config.Houses[house].tier == 10 then
+        return exports['qb-interior']:CreateHouseTrailer(coords)
+    elseif Config.Houses[house].tier == 11 then
+        return exports['qb-interior']:CreateHouseMedium2(coords)
+    elseif Config.Houses[house].tier == 12 then
+        return exports['qb-interior']:CreateHousev16low(coords)
+    elseif Config.Houses[house].tier == 13 then
+        return exports['qb-interior']:CreateHouseTrevor(coords)
+    elseif Config.Houses[house].tier == 14 then
+        return exports['qb-interior']:CreateHousev16mid(coords)
+    elseif Config.Houses[house].tier == 15 then
+        return exports['qb-interior']:CreateHouseApartment2(coords)
+    elseif Config.Houses[house].tier == 16 then
+        return exports['qb-interior']:CreateHouseApartment1(coords)
+    elseif Config.Houses[house].tier == 17 then
+        return exports['qb-interior']:CreateHouseHighEndv2(coords)
+    elseif Config.Houses[house].tier == 18 then
+        return exports['qb-interior']:CreateHouseHighEnd(coords)
+    elseif Config.Houses[house].tier == 19 then
+        return exports['qb-interior']:CreateHouseApartment3(coords)
+    elseif Config.Houses[house].tier == 20 then
+        return exports['qb-interior']:CreateHouseMichael(coords)
+    elseif Config.Houses[house].tier == 21 then
+        return exports['qb-interior']:CreateHouseWestons(coords)
+    elseif Config.Houses[house].tier == 22 then
+        return exports['qb-interior']:CreateHouseWestons2(coords)
+    elseif Config.Houses[house].tier == 23 then
+        return exports['qb-interior']:CreateHouseBanham(coords)
+    elseif Config.Houses[house].tier == 24 then
+        return exports['qb-interior']:CreateHouseStashHouse1(coords)
+    elseif Config.Houses[house].tier == 25 then
+        return exports['qb-interior']:CreateHouseStashHouse2(coords)
+    elseif Config.Houses[house].tier == 26 then
+        return exports['qb-interior']:CreateHouseStashHouse3(coords)
+    elseif Config.Houses[house].tier == 27 then
+        return exports['qb-interior']:CreateHouseBarberShop(coords)
+    elseif Config.Houses[house].tier == 28 then
+        return exports['qb-interior']:CreateHouseDecentWarehouse(coords)
+    elseif Config.Houses[house].tier == 29 then
+        return exports['qb-interior']:CreateHouseBiggerWarehouse(coords)
+    elseif Config.Houses[house].tier == 30 then
+        return exports['qb-interior']:CreateHouseLargeGarage(coords)
+    elseif Config.Houses[house].tier == 31 then
+        return exports['qb-interior']:CreateHouseMediumGarage(coords)
+    elseif Config.Houses[house].tier == 32 then
+        return exports['qb-interior']:CreateHouseSmallGarage(coords)
+    elseif Config.Houses[house].tier == 33 then
+        return exports['qb-interior']:CreateHouseGunStore(coords)
+    elseif Config.Houses[house].tier == 34 then
+        return exports['qb-interior']:CreateHouseMethProduction(coords)
+    elseif Config.Houses[house].tier == 35 then
+        return exports['qb-interior']:CreateHouseSmallOffice(coords)
+    elseif Config.Houses[house].tier == 36 then
+        return exports['qb-interior']:CreateHouseSmallOffice2(coords)
+    elseif Config.Houses[house].tier == 37 then
+        return exports['qb-interior']:CreateHouseExecOffice(coords)
+    elseif Config.Houses[house].tier == 38 then
+        return exports['qb-interior']:CreateHouseSmallStore(coords)
+    elseif Config.Houses[house].tier == 39 then
+        return exports['qb-interior']:CreateHouseMediumStore(coords)
+    elseif Config.Houses[house].tier == 40 then
+        return exports['qb-interior']:CreateHouseLiquorStore(coords)
+    elseif Config.Houses[house].tier == 41 then
+        return exports['qb-interior']:CreateHouseSmallWarehouse(coords)
+    elseif Config.Houses[house].tier == 42 then
+        return exports['qb-interior']:CreateHouseBiggerWarehouse(coords)
+    elseif Config.Houses[house].tier == 43 then
+        return exports['qb-interior']:CreateHouseShitWarehouse(coords)
+    elseif Config.Houses[house].tier == 44 then
+        return exports['qb-interior']:CreateHouseHugeWarehouse(coords)
+    elseif Config.Houses[house].tier == 45 then
+        return exports['qb-interior']:CreateHouseWeedPrefilledWarehouse(coords)
+    elseif Config.Houses[house].tier == 46 then
+        return exports['qb-interior']:CreateFurniMotelModern(coords)
+    elseif Config.Houses[house].tier == 47 then
+        return exports['qb-interior']:CreateContainer(coords)
+    elseif Config.Houses[house].tier == 48 then
+        return exports['qb-interior']:CreateFurniMotelStandard(coords)
     end
 end
 
@@ -954,11 +995,11 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     ClosestHouse = nil
     HasHouseKey = false
     isOwned = false
-    for k, v in pairs(OwnedHouseBlips) do
+    for _, v in pairs(OwnedHouseBlips) do
         RemoveBlip(v)
     end
     if Config.UnownedBlips then
-        for k,v in pairs(UnownedHouseBlips) do
+        for _, v in pairs(UnownedHouseBlips) do
             RemoveBlip(v)
         end
     end
@@ -972,7 +1013,7 @@ end)
 RegisterNetEvent('qb-houses:client:createHouses', function(price, tier)
     local pos = GetEntityCoords(PlayerPedId())
     local heading = GetEntityHeading(PlayerPedId())
-	local s1, s2 = GetStreetNameAtCoord(pos.x, pos.y, pos.z)
+	local s1, _ = GetStreetNameAtCoord(pos.x, pos.y, pos.z)
     local street = GetStreetNameFromHashKey(s1)
     local coords = {
         enter 	= { x = pos.x, y = pos.y, z = pos.z, h = heading},
@@ -1098,11 +1139,11 @@ RegisterNetEvent('qb-houses:client:removeHouseKey', function()
     end
 end)
 
-RegisterNetEvent('qb-houses:client:RevokeKey', function(data)
-    RemoveHouseKey(data.citizenData)
+RegisterNetEvent('qb-houses:client:RevokeKey', function(cData)
+    RemoveHouseKey(cData.citizenData)
 end)
 
-RegisterNetEvent('qb-houses:client:refreshHouse', function(data)
+RegisterNetEvent('qb-houses:client:refreshHouse', function()
     Wait(100)
     SetClosestHouse()
 end)
@@ -1140,9 +1181,9 @@ RegisterNetEvent('qb-houses:client:setupHouseBlips', function() -- Setup owned o
         if LocalPlayer.state['isLoggedIn'] then
             QBCore.Functions.TriggerCallback('qb-houses:server:getOwnedHouses', function(ownedHouses)
                 if ownedHouses then
-                    for k, v in pairs(ownedHouses) do
+                    for k, _ in pairs(ownedHouses) do
                         local house = Config.Houses[ownedHouses[k]]
-                        HouseBlip = AddBlipForCoord(house.coords.enter.x, house.coords.enter.y, house.coords.enter.z)
+                        local HouseBlip = AddBlipForCoord(house.coords.enter.x, house.coords.enter.y, house.coords.enter.z)
                         SetBlipSprite (HouseBlip, 40)
                         SetBlipDisplay(HouseBlip, 4)
                         SetBlipScale  (HouseBlip, 0.65)
@@ -1160,13 +1201,9 @@ RegisterNetEvent('qb-houses:client:setupHouseBlips', function() -- Setup owned o
 end)
 
 RegisterNetEvent('qb-houses:client:setupHouseBlips2', function() -- Setup unowned on load
-    for k,v in pairs(UnownedHouseBlips) do RemoveBlip(v) end
-    Wait(5000)
-    for k,v in pairs(Config.Houses) do
-        -- print(v.adress)
-        if v.owned == 0 and string.sub(v.adress, 1, 9) ~= 'Buccaneer' then
-            -- print("create unowned blip")
-            HouseBlip2 = AddBlipForCoord(v.coords.enter.x, v.coords.enter.y, v.coords.enter.z)
+    for _, v in pairs(Config.Houses) do
+        if not v.owned then
+            local HouseBlip2 = AddBlipForCoord(v.coords.enter.x, v.coords.enter.y, v.coords.enter.z)
             SetBlipSprite (HouseBlip2, 40)
             SetBlipDisplay(HouseBlip2, 4)
             SetBlipScale  (HouseBlip2, 0.65)
@@ -1181,7 +1218,7 @@ RegisterNetEvent('qb-houses:client:setupHouseBlips2', function() -- Setup unowne
 end)
 
 RegisterNetEvent('qb-houses:client:createBlip', function(coords) -- Create unowned on command
-    NewHouseBlip = AddBlipForCoord(coords.x, coords.y, coords.z)
+    local NewHouseBlip = AddBlipForCoord(coords.x, coords.y, coords.z)
     SetBlipSprite (NewHouseBlip, 40)
     SetBlipDisplay(NewHouseBlip, 4)
     SetBlipScale  (NewHouseBlip, 0.65)
@@ -1194,7 +1231,7 @@ RegisterNetEvent('qb-houses:client:createBlip', function(coords) -- Create unown
 end)
 
 RegisterNetEvent('qb-houses:client:refreshBlips', function() -- Refresh unowned on buy
-    for k,v in pairs(UnownedHouseBlips) do RemoveBlip(v) end
+    for _, v in pairs(UnownedHouseBlips) do RemoveBlip(v) end
     Wait(250)
     TriggerEvent('qb-houses:client:setupHouseBlips2')
     DeleteHousesTargets()
@@ -1222,17 +1259,17 @@ RegisterNetEvent('qb-houses:client:viewHouse', function(houseprice, brokerfee, b
     })
 end)
 
-RegisterNetEvent('qb-houses:client:setLocation', function(data)
+RegisterNetEvent('qb-houses:client:setLocation', function(cData)
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
     local coords = {x = pos.x, y = pos.y, z = pos.z}
     if IsInside then
         if HasHouseKey then
-            if data.id == 'setstash' then
+            if cData.id == 'setstash' then
                 TriggerServerEvent('qb-houses:server:setLocation', coords, ClosestHouse, 1)
-            elseif data.id == 'setoutift' then
+            elseif cData.id == 'setoutift' then
                 TriggerServerEvent('qb-houses:server:setLocation', coords, ClosestHouse, 2)
-            elseif data.id == 'setlogout' then
+            elseif cData.id == 'setlogout' then
                 TriggerServerEvent('qb-houses:server:setLocation', coords, ClosestHouse, 3)
             end
         else
@@ -1681,8 +1718,8 @@ RegisterNetEvent('qb-houses:client:ViewHouse', function()
     end
 end)
 
-RegisterNetEvent('qb-houses:client:KeyholderOptions', function(data)
-    optionMenu(data.citizenData)
+RegisterNetEvent('qb-houses:client:KeyholderOptions', function(cData)
+    optionMenu(cData.citizenData)
 end)
 
 RegisterNetEvent('qb-house:client:RefreshHouseTargets', function ()
@@ -1692,22 +1729,25 @@ end)
 
 -- NUI Callbacks
 
-RegisterNUICallback('HasEnoughMoney', function(data, cb)
-    QBCore.Functions.TriggerCallback('qb-houses:server:HasEnoughMoney', function(hasEnough)
-    end, data.objectData)
+RegisterNUICallback('HasEnoughMoney', function(cData, cb)
+    QBCore.Functions.TriggerCallback('qb-houses:server:HasEnoughMoney', function(_)
+        cb('ok')
+    end, cData.objectData)
 end)
 
-RegisterNUICallback('buy', function()
+RegisterNUICallback('buy', function(_, cb)
     openContract(false)
     disableViewCam()
     Config.Houses[ClosestHouse].owned = true
     if Config.UnownedBlips then TriggerEvent('qb-houses:client:refreshBlips') end
     TriggerServerEvent('qb-houses:server:buyHouse', ClosestHouse)
+    cb("ok")
 end)
 
-RegisterNUICallback('exit', function()
+RegisterNUICallback('exit', function(_, cb)
     openContract(false)
     disableViewCam()
+    cb("ok")
 end)
 
 -- Threads
@@ -1758,138 +1798,6 @@ CreateThread(function()
     while true do
         wait = 5000
         local pos = GetEntityCoords(PlayerPedId())
-        -- if ClosestHouse ~= nil and not IsInside  then
-        --     if not isOwned then
-        --         local houseCoords = vector3(Config.Houses[ClosestHouse].coords.enter.x, Config.Houses[ClosestHouse].coords.enter.y, Config.Houses[ClosestHouse].coords.enter.z)
-        --         if #(pos - houseCoords) <= 1.5 then
-        --             if not viewCam and Config.Houses[ClosestHouse].locked then
-        --                 houseMenu = {
-        --                     {
-        --                         header = Lang:t("menu.view_house"),
-        --                         params = {
-        --                             event = 'qb-houses:client:ViewHouse',
-        --                             args = {}
-        --                         }
-        --                     },
-        --                     {
-        --                         header = Lang:t("menu.preview_house"),
-        --                         params = {
-        --                             event = "qb-houses:client:PreviewHouse",
-
-        --                         }
-        --                     },
-        --                 }
-        --                 nearLocation = true
-        --             end
-        --         end
-        --     end
-
-        --     if isOwned then
-        --         local houseCoords = vector3(Config.Houses[ClosestHouse].coords.enter.x, Config.Houses[ClosestHouse].coords.enter.y, Config.Houses[ClosestHouse].coords.enter.z)
-        --         if #(pos - houseCoords) <= 1.5 then
-        --             nearLocation = true
-        --             houseMenu = {
-        --                 {
-        --                     header = Lang:t("menu.ring_door"),
-        --                     params = {
-        --                         event = 'qb-houses:client:RequestRing',
-        --                         args = {}
-        --                     }
-        --                 }
-        --             }
-        --             print(Config.Houses[ClosestHouse].locked)
-        --             if not Config.Houses[ClosestHouse].locked then
-        --                 houseMenu[#houseMenu+1] = {
-        --                     header = Lang:t("menu.enter_unlocked_house"),
-        --                     params = {
-        --                         event = "qb-houses:client:EnterHouse",
-        --                     }
-        --                 }
-        --                 if QBCore.Functions.GetPlayerData().job.name == 'police' then
-        --                     houseMenu[#houseMenu+1] = {
-        --                         header = Lang:t("menu.lock_door_police"),
-        --                         params = {
-        --                             event = "qb-houses:client:ResetHouse",
-        --                         }
-        --                     }
-        --                 end
-        --             end
-        --         end
-        --     end
-        -- end
-
-        -- if IsInside and CurrentHouse ~= nil and not entering then
-        --     if POIOffsets ~= nil then
-        --         local exitOffset = vector3(Config.Houses[CurrentHouse].coords.enter.x + POIOffsets.exit.x, Config.Houses[CurrentHouse].coords.enter.y + POIOffsets.exit.y, Config.Houses[CurrentHouse].coords.enter.z - Config.MinZOffset + POIOffsets.exit.z + 1.0)
-        --         if #(pos - exitOffset) <= 1.5 then
-        --             houseMenu = {
-        --                 {
-        --                     header = Lang:t("menu.exit_door"),
-        --                     params = {
-        --                         event = 'qb-houses:client:ExitOwnedHouse',
-        --                         args = {}
-        --                     }
-        --                 }
-        --             }
-        --             nearLocation = true
-        --         end
-        --     end
-        -- end
-        -- end
-
-        -- if IsInside and CurrentHouse ~= nil and not entering and isOwned then
-        --     if stashLocation ~= nil then
-        --         if #(pos - vector3(stashLocation.x, stashLocation.y, stashLocation.z)) <= 1.5 then
-        --             nearLocation = true
-        --             houseMenu = {
-        --                 {
-        --                     header = Lang:t("menu.open_stash"),
-        --                     params = {
-        --                         event = "qb-houses:client:OpenStash",
-        --                         args = {}
-        --                     }
-        --                 }
-        --             }
-
-        --         elseif #(pos - vector3(stashLocation.x, stashLocation.y, stashLocation.z)) <= 3 then
-        --             DrawText3Ds(stashLocation.x, stashLocation.y, stashLocation.z, Lang:t("menu.stash"))
-        --         end
-        --     end
-
-        --     if outfitLocation ~= nil then
-        --         if #(pos - vector3(outfitLocation.x, outfitLocation.y, outfitLocation.z)) <= 1.5 then
-        --             nearLocation = true
-        --             houseMenu = {
-        --                 {
-        --                     header = Lang:t("menu.change_outfit"),
-        --                     params = {
-        --                         event = "qb-houses:client:ChangeOutfit",
-        --                         args = {}
-        --                     }
-        --                 }
-        --             }
-        --         elseif #(pos - vector3(outfitLocation.x, outfitLocation.y, outfitLocation.z)) <= 3 then
-        --             DrawText3Ds(outfitLocation.x, outfitLocation.y, outfitLocation.z, Lang:t("menu.outfits"))
-        --         end
-        --     end
-
-        --     if logoutLocation ~= nil then
-        --         if #(pos - vector3(logoutLocation.x, logoutLocation.y, logoutLocation.z)) <= 1.5 then
-        --             nearLocation = true
-        --             houseMenu = {
-        --                 {
-        --                     header = Lang:t("menu.change_character"),
-        --                     params = {
-        --                         event = "qb-houses:client:ChangeCharacter",
-        --                         args = {}
-        --                     }
-        --                 }
-        --             }
-        --         elseif #(pos - vector3(logoutLocation.x, logoutLocation.y, logoutLocation.z)) < 3 then
-        --             DrawText3Ds(logoutLocation.x, logoutLocation.y, logoutLocation.z, Lang:t("menu.characters"))
-        --         end
-        --     end
-        -- end
 
         if not IsInside then
             SetClosestHouse()
@@ -1933,9 +1841,9 @@ RegisterCommand('getoffset', function()
         Config.Houses[CurrentHouse].coords.enter.z - Config.MinZOffset
     )
     if IsInside then
-        local xdist = coords.x - houseCoords.x
-        local ydist = coords.y - houseCoords.y
-        local zdist = coords.z - houseCoords.z
+        local xdist = houseCoords.x - coords.x
+        local ydist = houseCoords.y - coords.y
+        local zdist = houseCoords.z - coords.z
         print('X: '..xdist)
         print('Y: '..ydist)
         print('Z: '..zdist)
