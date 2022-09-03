@@ -35,9 +35,6 @@ files {
 
 dependencies {
 	'qb-core',
-	'qb-interior',
-	'qb-clothing',
-	'qb-weathersync'
 }
 
 lua54 'yes'

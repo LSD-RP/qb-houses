@@ -2,7 +2,7 @@ ObjectList = {}
 local DecoMode = false
 local MainCamera = nil
 local curPos
-local speeds = {0.01, 0.05, 0.1, 0.2, 0.4, 0.5}
+local speeds = {0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.4, 0.5}
 local curSpeed = 1
 local cursorEnabled = false
 local SelectedObj = nil
@@ -243,15 +243,19 @@ RegisterNUICallback("closedecorations", function(_, cb)
 	cb("ok")
 end)
 
-RegisterNUICallback("deleteSelectedObject", function(_, cb)
-	DeleteObject(SelectedObj)
-	SelectedObj = nil
-	table.remove(ObjectList, SelObjId)
-	Wait(100)
-	SaveDecorations()
-	SelObjId = 0
-	peanut = false
-	cb("ok")
+RegisterNUICallback("deleteSelectedObject", function(data, cb)
+	local price = Config.Prices[data.objData.hashname]
+	QBCore.Functions.TriggerCallback('qb-houses:server:sellFurniture', function(isSuccess)
+        if isSuccess then
+            DeleteObject(SelectedObj)
+			SelectedObj = nil
+			table.remove(ObjectList, SelObjId)
+			Wait(100)
+			SaveDecorations()
+			SelObjId = 0
+			peanut = false
+        end
+    end, price, data.objData.hashname)
 end)
 
 RegisterNUICallback("cancelSelectedObject", function(_, cb)
@@ -263,6 +267,7 @@ RegisterNUICallback("cancelSelectedObject", function(_, cb)
 end)
 
 RegisterNUICallback("buySelectedObject", function(data, cb)
+	if data.price == nil then data.price = 0 end
     QBCore.Functions.TriggerCallback('qb-houses:server:buyFurniture', function(isSuccess)
         if isSuccess then
             SetNuiFocus(false, false)
@@ -379,11 +384,11 @@ RegisterNUICallback("spawnobject", function(data, cb)
     local pos = GetEntityCoords(SelectedObj, true)
     local rot = GetEntityRotation(SelectedObj)
     SelObjRot = {x = rot.x, y = rot.y, z = rot.z}
-	SelObjPos = {x = pos.x, y = pos.y, z = pos.z}
 	SelObjHash = data.object
 	PlaceObjectOnGroundProperly(SelectedObj)
 	SetEntityCompletelyDisableCollision(SelectedObj, true) -- Prevents crazy physics when collidin with other entitys
-    peanut = true
+    SelObjPos = {x = pos.x, y = pos.y, z = pos.z}
+	peanut = true
 	cb("ok")
 end)
 
@@ -421,7 +426,7 @@ end)
 
 CreateThread(function()
 	while true do
-		Wait(7)
+		Wait(2)
 		if DecoMode then
 			DisableAllControlActions(0)
 			EnableControlAction(0, 32, true) -- W
@@ -447,8 +452,8 @@ CreateThread(function()
             CheckMovementInput()
 
 			if SelectedObj and peanut then
-		SetEntityDrawOutline(SelectedObj)
-		SetEntityDrawOutlineColor(116, 189, 252, 100)
+				SetEntityDrawOutline(SelectedObj)
+				SetEntityDrawOutlineColor(116, 189, 252, 100)
                 DrawMarker(21, SelObjPos.x, SelObjPos.y, SelObjPos.z + 1.28, 0.0, 0.0, 0.0, 180.0, 0.0, 0.0, 0.6, 0.6, 0.6, 28, 149, 255, 100, true, true, 2, false, false, false, false)
                 if rotateActive then
                     CheckObjRotationInput()
@@ -495,14 +500,14 @@ end)
 -- Out of area
 CreateThread(function()
 	while true do
-		Wait(7)
+		Wait(2)
 		if DecoMode then
 			local camPos = GetCamCoord(MainCamera)
 			local dist = #(vector3(camPos.x, camPos.y, camPos.z) - vector3(Config.Houses[ClosestHouse].coords.enter.x, Config.Houses[ClosestHouse].coords.enter.y, Config.Houses[ClosestHouse].coords.enter.z))
-			if dist > 50.0 then
+			if IsControlJustReleased(0, 200) then
 				DisableEditMode()
 				closeDecorateUI()
-				QBCore.Functions.Notify(Lang:t("error.out_range"), 'error')
+				-- QBCore.Functions.Notify(Lang:t("error.out_range"), 'error')
 			end
 		end
 	end

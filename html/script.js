@@ -60,11 +60,11 @@ $('document').ready(function() {
     })
 
     document.onkeyup = function (data) {
-        if (data.which == 116 ) {
+        if (data.key == "F5" ) {
             $.post('https://qb-houses/toggleCursor');
         }
 
-        if (data.which == 13 ) {
+        if (data.key == "Enter" ) {
             if (selectedObjectData != null && $(".decorate-confirm").css('display') != 'block') {
                 $.post('https://qb-houses/editOwnedObject', JSON.stringify({
                     objectData: selectedObjectData
@@ -94,7 +94,7 @@ $('document').ready(function() {
             }
         }
 
-        if (data.which == 27) {
+        if (data.key == "Escape") {
             Decorations.Close();
         }
     };
@@ -175,7 +175,9 @@ $(document).on('click', '.footer-btn', function(){
         $(".decorate-items").html("");
         $(".decorate-footer-buttons").html("");
         $(selectedHeaderButton).removeClass('header-btn-selected');
-        $.post('https://qb-houses/deleteSelectedObject');
+        $.post('https://qb-houses/deleteSelectedObject', JSON.stringify({
+            objData: selectedObjectData,
+        }));
         $(".decorate-footer-buttons").fadeOut(150);
         $(".decorate-items").fadeOut(150);
     }
@@ -183,7 +185,7 @@ $(document).on('click', '.footer-btn', function(){
 
 $(document).on('click', '#buy-object', function(){
     $.post("https://qb-houses/buySelectedObject", JSON.stringify({
-        price: selectedObjectData.price,
+        info: selectedObjectData,
     }));
     selectedObjectData = null;
     $(".decorate-confirm").css("display", "none");
