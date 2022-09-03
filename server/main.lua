@@ -36,6 +36,38 @@ CreateThread(function()
     TriggerClientEvent("qb-houses:client:setHouseConfig", -1, Config.Houses)
 end)
 
+RegisterNetEvent("qb-houses:server:refreshResource", function()
+    local HouseGarages = {}
+    local result = MySQL.Sync.fetchAll('SELECT * FROM houselocations', {})
+    if result[1] then
+        for k, v in pairs(result) do
+            print(v.label)
+            print(v.owned)
+            local owned = false
+            if tonumber(v.owned) == 1 then
+                owned = true
+            end
+            local garage = json.decode(v.garage) or {}
+            Config.Houses[v.name] = {
+                coords = json.decode(v.coords),
+                owned = v.owned,
+                price = v.price,
+                locked = true,
+                adress = v.label,
+                tier = v.tier,
+                garage = garage,
+                decorations = {}
+            }
+            HouseGarages[v.name] = {
+                label = v.label,
+                takeVehicle = garage
+            }
+        end
+    end
+    TriggerClientEvent("qb-garages:client:houseGarageConfig", -1, HouseGarages)
+    TriggerClientEvent("qb-houses:client:setHouseConfig", -1, Config.Houses)
+end)
+
 CreateThread(function()
     while true do
         if not housesLoaded then
@@ -72,6 +104,28 @@ QBCore.Commands.Add("createhouse", Lang:t("info.create_house"), {{name = "price"
         TriggerClientEvent('QBCore:Notify', src, Lang:t("error.realestate_only"), "error")
     end
 end)
+
+QBCore.Commands.Add("removehouse", Lang:t("info.remove_house"), {}, true, function(source, args)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player.PlayerData.job.name == "realestate" then
+        TriggerClientEvent("qb-houses:client:deleteHouse", src)
+    else
+        TriggerClientEvent('QBCore:Notify', src, Lang:t("error.realestate_only"), "error")
+    end
+end)
+
+QBCore.Commands.Add("confirmremove", Lang:t("info.confirm_delete"), {}, true, function(source, args)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player.PlayerData.job.name == "realestate" then
+        TriggerClientEvent("qb-houses:client:confirmDelete", src)
+    else
+        TriggerClientEvent('QBCore:Notify', src, Lang:t("error.realestate_only"), "error")
+    end
+end)
+
+
 
 QBCore.Commands.Add("addgarage", Lang:t('info.add_garage'), {}, false, function(source)
     local src = source
@@ -188,6 +242,24 @@ RegisterNetEvent('qb-houses:server:addNewHouse', function(street, coords, price,
     TriggerEvent('qb-log:server:CreateLog', 'house', Lang:t("log.house_created"), 'green', Lang:t("log.house_address", {label = label, price = price, tier = tier, agent = GetPlayerName(src)}))
 end)
 
+RegisterNetEvent('qb-houses:server:removeHouse', function(house)
+    local src = source
+    
+    exports.oxmysql:executeSync('DELETE FROM houselocations WHERE name = ?', {house})
+
+    local tempHouses = {}
+    for i,v in pairs(Config.Houses) do
+        if i ~= house then
+            tempHouses[i] = v
+        end
+    end
+    Config.Houses = tempHouses
+    TriggerClientEvent("qb-houses:client:setHouseConfig", -1, Config.Houses)
+    TriggerClientEvent('QBCore:Notify', src, Lang:t("info.removed_house", {value = house}))
+    TriggerEvent('qb-log:server:CreateLog', 'house', Lang:t("log.house_removed"), 'green', GetPlayerName(src) .. ' removed ' .. house)
+    TriggerClientEvent('qb-houses:client:refreshBlips', -1)
+end)
+
 RegisterNetEvent('qb-houses:server:addGarage', function(house, coords)
     local src = source
     MySQL.update('UPDATE houselocations SET garage = ? WHERE name = ?', {json.encode(coords), house})
@@ -240,8 +312,9 @@ RegisterNetEvent('qb-houses:server:buyHouse', function(house)
         exports['qb-management']:AddMoney("realestate", (HousePrice / 100) * math.random(18, 25))
         TriggerEvent('qb-log:server:CreateLog', 'house', Lang:t("log.house_purchased"), 'green', Lang:t("log.house_purchased_by", {house = house:upper(), price = HousePrice, firstname = pData.PlayerData.charinfo.firstname, lastname = pData.PlayerData.charinfo.lastname}))
         TriggerClientEvent('QBCore:Notify', src, Lang:t("success.house_purchased"), 'success', 5000)
+        TriggerClientEvent('qb-houses:client:refreshBlips', -1)
     else
-        TriggerClientEvent('QBCore:Notify', src, Lang:t("error.not_enough_money"), "error")
+        TriggerClientEvent('QBCore:Notify', source, "Not enough money.", "error")
     end
 end)
 
@@ -369,16 +442,34 @@ end)
 
 -- Callbacks
 
-QBCore.Functions.CreateCallback('qb-houses:server:buyFurniture', function(source, cb, price)
+QBCore.Functions.CreateCallback('qb-houses:server:buyFurniture', function(source, cb, price, hashname)
     local src = source
     local pData = QBCore.Functions.GetPlayer(src)
     local bankBalance = pData.PlayerData.money["bank"]
 
     if bankBalance >= price then
         pData.Functions.RemoveMoney('bank', price, "bought-furniture")
+        TriggerEvent("qb-log:server:CreateLog", "furniture", "Bought", "red", "**"..GetPlayerName(src) .. "** bought "..hashname.." for $" .. price)
+
         cb(true)
     else
         TriggerClientEvent('QBCore:Notify', src, Lang:t("error.not_enough_money"), "error")
+        cb(false)
+    end
+end)
+
+QBCore.Functions.CreateCallback('qb-houses:server:sellFurniture', function(source, cb, price, hashname)
+    local src = source
+    local pData = QBCore.Functions.GetPlayer(src)
+    local bankBalance = pData.PlayerData.money["bank"]
+    print(price)
+    if pData.Functions.AddMoney('bank', price, 'sold-furniture') then
+        TriggerEvent("qb-log:server:CreateLog", "furniture", "Sold", "green", "**"..GetPlayerName(src) .. "** sold "..hashname.." for $" .. price)
+
+        -- pData.Functions.RemoveMoney('bank', price, "bought-furniture")
+        cb(true)
+    else
+        TriggerClientEvent('QBCore:Notify', src, "Error", "error")
         cb(false)
     end
 end)
@@ -486,7 +577,37 @@ QBCore.Functions.CreateCallback('qb-phone:server:TransferCid', function(_, cb, N
     end
 end)
 
-QBCore.Functions.CreateCallback('qb-houses:server:getHouseDecorations', function(_, cb, house)
+QBCore.Functions.CreateCallback('qb-houses:server:sellHouse', function(source, cb, house)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    local cid = Player.PlayerData.citizenid
+    local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = ?', {cid})
+    if result[1] then
+        local HouseName = house.name
+        housekeyholders[HouseName] = {}
+        housekeyholders[HouseName][1] = nil
+        houseownercid[HouseName] = nil
+        houseowneridentifier[HouseName] = nil
+        local salePrice = house.price * 0.80
+        salePrice = math.ceil(salePrice)
+        if Player.Functions.AddMoney('bank', salePrice) then
+            exports.oxmysql:execute('UPDATE houselocations SET owned = ? WHERE name = ?',
+            {0, HouseName})
+            exports.oxmysql:execute('DELETE FROM player_houses WHERE house = ? AND citizenid = ?',
+            {HouseName, cid})
+            cb(true)
+            TriggerClientEvent('qb-houses:client:refreshBlips', -1)
+            TriggerEvent('qb-log:server:CreateLog', 'house', "House sold", 'red', Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname .. ' sold a house ' .. HouseName .. ' for $' .. salePrice)
+
+        else
+            cb(false)
+        end
+    else
+        cb(false)
+    end
+end)
+
+QBCore.Functions.CreateCallback('qb-houses:server:getHouseDecorations', function(source, cb, house)
     local retval = nil
     local result = MySQL.query.await('SELECT * FROM player_houses WHERE house = ?', {house})
     if result[1] then
