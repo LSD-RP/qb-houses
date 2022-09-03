@@ -1822,6 +1822,49 @@ CreateThread(function ()
     end
 end)
 
+Citizen.CreateThread(function()
+    while true do
+        local sleep = 5000
+
+        if IsInside then
+            local stashLoc = nil
+            local outfitLoc = nil
+            local logoutLoc = nil
+            if stashLocation then 
+                stashLoc = vector3(stashLocation.x, stashLocation.y, stashLocation.z)
+            end
+            if outfitLocation then
+                outfitLoc = vector3(outfitLocation.x, outfitLocation.y, outfitLocation.z)
+
+            end
+            if logoutLocation then
+                logoutLoc = vector3(logoutLocation.x, logoutLocation.y, logoutLocation.z)
+            end
+            sleep = 2
+            local pos = GetEntityCoords(PlayerPedId())
+            -- local stashLocation = nil
+            -- local outfitLocation = nil
+            -- local logoutLocation = nil
+            if stashLoc ~= nil then
+                if #(pos - stashLoc) < 2.0 then
+                    DrawText3Ds(stashLoc.x, stashLoc.y, stashLoc.z, "~y~[E]~w~ Open Stash")
+                end
+            end
+            if outfitLoc ~= nil then
+                if #(pos - outfitLoc) < 2.0 then
+                    DrawText3Ds(outfitLoc.x, outfitLoc.y, outfitLoc.z, "~y~[E]~w~ Change Outfits")
+                end
+            end
+            if logoutLoc ~= nil then
+                if #(pos - logoutLoc) < 2.0 then
+                    DrawText3Ds(logoutLoc.x, logoutLoc.y, logoutLoc.z, "~y~[E]~w~ Change Character")
+                end
+            end
+        end
+        Wait(sleep)
+    end
+end)
+
 RegisterCommand('getoffset', function()
     local coords = GetEntityCoords(PlayerPedId())
     local houseCoords = vector3(

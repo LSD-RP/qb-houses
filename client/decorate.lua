@@ -267,7 +267,6 @@ RegisterNUICallback("cancelSelectedObject", function(_, cb)
 end)
 
 RegisterNUICallback("buySelectedObject", function(data, cb)
-	if data.price == nil then data.price = 0 end
     QBCore.Functions.TriggerCallback('qb-houses:server:buyFurniture', function(isSuccess)
         if isSuccess then
             SetNuiFocus(false, false)
@@ -283,7 +282,7 @@ RegisterNUICallback("buySelectedObject", function(data, cb)
             peanut = false
         end
 		cb('ok')
-    end, data.price)
+    end, data.info.price, data.info.object)
 end)
 
 RegisterNUICallback('setupMyObjects', function(_, cb)
