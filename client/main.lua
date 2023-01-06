@@ -898,7 +898,7 @@ local function LeaveHouse(house)
     end
 end
 
-local function enterNonOwnedHouse(house)
+function enterNonOwnedHouse(house)
     CurrentHouse = house
     ClosestHouse = house
     TriggerServerEvent("InteractSound_SV:PlayOnSource", "houses_door_open", 0.25)
@@ -1199,7 +1199,7 @@ end)
 
 RegisterNetEvent('qb-houses:client:setupHouseBlips2', function() -- Setup unowned on load
     for _, v in pairs(Config.Houses) do
-        if not v.owned then
+        if not v.owned and v.price < 999999999 then
             local HouseBlip2 = AddBlipForCoord(v.coords.enter.x, v.coords.enter.y, v.coords.enter.z)
             SetBlipSprite (HouseBlip2, 40)
             SetBlipDisplay(HouseBlip2, 4)
@@ -1771,10 +1771,6 @@ end)
 
 CreateThread(function ()
     local wait = 500
-    while not LocalPlayer.state.isLoggedIn do
-        -- do nothing
-        Wait(wait)
-    end
 
     TriggerServerEvent('qb-houses:server:setHouses')
     TriggerEvent('qb-houses:client:setupHouseBlips')
@@ -1880,4 +1876,20 @@ RegisterCommand('getoffset', function()
         print('Y: '..ydist)
         print('Z: '..zdist)
     end
+end)
+
+AddEventHandler('onResourceStart', function(resourceName)
+    if (GetCurrentResourceName() ~= resourceName) then
+      return
+    end
+    Wait(1000)
+    TriggerServerEvent('qb-houses:server:setHouses')
+    TriggerEvent('qb-houses:client:setupHouseBlips')
+    if Config.UnownedBlips then
+        TriggerEvent('qb-houses:client:setupHouseBlips2')
+    end
+    TriggerEvent('qb-garages:client:setHouseGarage', ClosestHouse, HasHouseKey)
+    TriggerServerEvent("qb-houses:server:setHouses")
+
+    
 end)
